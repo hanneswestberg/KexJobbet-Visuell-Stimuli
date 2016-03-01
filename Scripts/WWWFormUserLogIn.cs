@@ -21,7 +21,6 @@ public class WWWFormUserLogIn : MonoBehaviour {
 
 
 	IEnumerator SendLogInInfoIEnumerator(){
-
 		WWWForm form = new WWWForm();
 
 		form.AddField("userName", userName);
@@ -34,7 +33,12 @@ public class WWWFormUserLogIn : MonoBehaviour {
 		if(!string.IsNullOrEmpty(download.error)){
 			print("Error downloading: " + download.error);
 		}else{
-			Debug.Log(download.text);
+			if(download.text == "False"){
+				this.GetComponent<UIScriptManager>().WrongUsernameOrPasswordTextPopUp();
+			}else{
+				this.GetComponent<UIScriptManager>().WrongUsernameOrPasswordTextPopUp();
+				Debug.Log(download.text);
+			}
 		}
 	}
 }
