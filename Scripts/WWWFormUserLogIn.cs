@@ -15,14 +15,17 @@ public class WWWFormUserLogIn : MonoBehaviour {
 		userName = value;
 	}
 
-	public IEnumerator SendLogInInfo(){
+	public void SendLogInInfo(){
+		StartCoroutine(SendLogInInfoIEnumerator());
+	}
+
+
+	IEnumerator SendLogInInfoIEnumerator(){
 
 		WWWForm form = new WWWForm();
 
 		form.AddField("userName", userName);
 		form.AddField("userPassword", userPassword); //EJ KRYPTERAD
-
-		Debug.Log(form.ToString());
 
 		WWW download = new WWW(database_url, form);
 
