@@ -34,9 +34,9 @@ public class WWWFormUserLogIn : MonoBehaviour {
 			print("Error downloading: " + download.error);
 		}else{
 			if(download.text == "False"){
-				this.GetComponent<UIScriptManager>().WrongUsernameOrPasswordTextPopUp();
+				this.GetComponent<UILogInScriptManager>().WrongUsernameOrPasswordTextPopUp();
+				this.GetComponent<UILogInScriptManager>().LogInToApplication();
 			}else{
-				this.GetComponent<UIScriptManager>().WrongUsernameOrPasswordTextPopUp();
 				Debug.Log(download.text);
 			}
 		}

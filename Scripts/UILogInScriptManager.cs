@@ -3,10 +3,12 @@ using System.Collections;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class UIScriptManager : MonoBehaviour {
+public class UILogInScriptManager : MonoBehaviour {
 	
 	public Text inputFieldUserName;
 	public InputField inputFieldPassword;
+	public CanvasGroup logInCanvasGroup;
+	public CanvasGroup logOutCanvasGroup;
 	public GameObject wrongUsernameOrPasswordText_GO;
 	public GameObject logInButton_GO;
 	public GameObject rememberInfo_GO;
@@ -132,5 +134,19 @@ public class UIScriptManager : MonoBehaviour {
 		}else{
 			ResetInfo();
 		}
+	}
+
+	public void LogInToApplication(){
+		logInCanvasGroup.GetComponent<Animator>().SetTrigger("LogIn");
+		logInCanvasGroup.interactable = false;
+		logOutCanvasGroup.GetComponent<Animator>().SetTrigger("LogIn");
+		logOutCanvasGroup.interactable = true;
+	}
+
+	public void LogOutFromApplication(){
+		logInCanvasGroup.GetComponent<Animator>().SetTrigger("LogOut");
+		logInCanvasGroup.interactable = true;
+		logOutCanvasGroup.GetComponent<Animator>().SetTrigger("LogOut");
+		logOutCanvasGroup.interactable = false;
 	}
 }
