@@ -9,6 +9,7 @@ public class UILogInScriptManager : MonoBehaviour {
 	public InputField inputFieldPassword;
 	public CanvasGroup logInCanvasGroup;
 	public CanvasGroup logOutCanvasGroup;
+	public CanvasGroup tasksGroup;
 	public GameObject wrongUsernameOrPasswordText_GO;
 	public GameObject logInButton_GO;
 	public GameObject rememberInfo_GO;
@@ -42,6 +43,11 @@ public class UILogInScriptManager : MonoBehaviour {
 			inputFieldUserName.transform.parent.GetComponent<InputField>().text = username;
 			inputFieldPassword.text = password;
 
+			// We also need to update our username and password in our WWWForm script
+
+			this.GetComponent<WWWFormUserLogIn>().UpdateUserName(username);
+			this.GetComponent<WWWFormUserLogIn>().UpdatePassword(password);
+
 			if(rememberInfo_int == 1){
 				rememberInfo_GO.GetComponent<Toggle>().isOn = true;
 			}
@@ -59,7 +65,6 @@ public class UILogInScriptManager : MonoBehaviour {
 		PlayerPrefs.SetString("password", (string)inputFieldPassword.text);
 		PlayerPrefs.SetInt("rememberInfo", (int)rememberInfo_int);
 		PlayerPrefs.SetInt("autoLogIn", (int)autoLogIn_int);
-
 	}
 		
 	void ResetInfo(){
@@ -124,7 +129,6 @@ public class UILogInScriptManager : MonoBehaviour {
 	}
 		
 	public void ButtonLogIn(){
-		//logInButton_GO.SetActive(false);
 		this.GetComponent<WWWFormUserLogIn>().SendLogInInfo();
 
 		if(rememberInfo_GO.GetComponent<Toggle>().isOn == true)
@@ -141,6 +145,8 @@ public class UILogInScriptManager : MonoBehaviour {
 		logInCanvasGroup.interactable = false;
 		logOutCanvasGroup.GetComponent<Animator>().SetTrigger("LogIn");
 		logOutCanvasGroup.interactable = true;
+		tasksGroup.GetComponent<Animator>().SetTrigger("LogIn");
+		tasksGroup.interactable = true;
 	}
 
 	public void LogOutFromApplication(){
@@ -148,5 +154,7 @@ public class UILogInScriptManager : MonoBehaviour {
 		logInCanvasGroup.interactable = true;
 		logOutCanvasGroup.GetComponent<Animator>().SetTrigger("LogOut");
 		logOutCanvasGroup.interactable = false;
+		tasksGroup.GetComponent<Animator>().SetTrigger("LogOut");
+		tasksGroup.interactable = false;
 	}
 }

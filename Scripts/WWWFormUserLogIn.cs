@@ -3,8 +3,9 @@ using System.Collections;
 
 public class WWWFormUserLogIn : MonoBehaviour {
 
-	string database_url = "http://xml.csc.kth.se/~thomasvp/DM2517/kex/index.php";
+	string database_url = "http://xml.csc.kth.se/~thomasvp/DM2517/kex/index.php?login=1";
 	string userName = "";
+
 	string userPassword = "";
 
 	public void UpdatePassword (string value) {
@@ -17,6 +18,12 @@ public class WWWFormUserLogIn : MonoBehaviour {
 
 	public void SendLogInInfo(){
 		StartCoroutine(SendLogInInfoIEnumerator());
+	}
+
+	public string UserName {
+		get {
+			return userName;
+		}
 	}
 
 
@@ -33,11 +40,13 @@ public class WWWFormUserLogIn : MonoBehaviour {
 		if(!string.IsNullOrEmpty(download.error)){
 			print("Error downloading: " + download.error);
 		}else{
-			if(download.text == "False"){
-				this.GetComponent<UILogInScriptManager>().WrongUsernameOrPasswordTextPopUp();
+			if(download.text == "True"){
 				this.GetComponent<UILogInScriptManager>().LogInToApplication();
+				Debug.Log(download.text);
+				GameObject.Find("TaskManager").GetComponent<WWWFormTasks>().RequestTasksFromDatabase();
 			}else{
 				Debug.Log(download.text);
+				this.GetComponent<UILogInScriptManager>().WrongUsernameOrPasswordTextPopUp();
 			}
 		}
 	}
