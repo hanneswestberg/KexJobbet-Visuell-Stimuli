@@ -21,11 +21,11 @@ public class WWWFormTasks : MonoBehaviour {
 	public void RequestCompletedTasksFromDatabase(){
 		StartCoroutine(GetCompletedTasksFromDatabaseIEnumerator());
 	}
+
 	public void ResetAllTasks(){
 		StartCoroutine(ResetAllTodosIEnumerator());
 	}
-
-
+		
 	IEnumerator RequestTasksFromDatabaseIEnumerator(){
 		WWW downloadedTaskData = new WWW(database_url + "?getTodos=1");
 		yield return downloadedTaskData;
@@ -43,7 +43,7 @@ public class WWWFormTasks : MonoBehaviour {
 		if(confirmedSentData.text == "Updated"){
 			this.GetComponent<UITaskScriptManager>().ConfirmedCompletedTaskFromDatabase(buttonNumber);
 		}else{
-			Debug.LogError("Unknown database response when sending completed task information.");
+			Debug.LogError("Unknown database response when sending completed task information. Expected Updated but got: " + confirmedSentData.text);
 		}
 	}
 
