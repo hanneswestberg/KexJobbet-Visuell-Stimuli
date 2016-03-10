@@ -59,7 +59,11 @@ public class WWWFormTasks : MonoBehaviour {
 	}
 
 	IEnumerator ResetAllTodosIEnumerator(){
-		WWW completedTasks = new WWW(database_url + "?undone=4");
+		WWWForm form = new WWWForm();
+		form.AddField("userName", userInfo.UserName);
+
+		WWW completedTasks = new WWW(database_url + "?undone=4", form);
+
 		yield return completedTasks;
 	}
 
