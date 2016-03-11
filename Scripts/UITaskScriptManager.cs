@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 public class UITaskScriptManager : MonoBehaviour {
 
+	public EffectsManager effectManager;
 	public GameObject effectPrefab;
 	public GameObject[] originalTasks;
 	public Text scoreCount;
@@ -51,11 +52,14 @@ public class UITaskScriptManager : MonoBehaviour {
 
 	public void ConfirmedCompletedTaskFromDatabase(int buttonNumber){
 		originalTasks[buttonNumber-1].GetComponent<Button>().interactable = false;
-		originalTasks[buttonNumber-1].GetComponent<TaskStarManager>().DestroyTaskStar();
-		AddStarsToTotal(buttonNumber);
+
+		originalTasks[buttonNumber-1].GetComponent<TaskStarManager>().AnimateTaskStar();
+
+		//TO BE CHANGED
+		//AddStarsToTotal(buttonNumber);
 	}
 
-	void AddStarsToTotal(int score = 0){
+	public void AddStarsToTotal(int score = 0){
 		scoreCount.text = (int.Parse(scoreCount.text) + score).ToString();
 	}
 
