@@ -37,10 +37,10 @@ public class StarAnimations : MonoBehaviour {
 		effectsManager.CreateEffectAt(effectsManager.starExplodeEffects[0], transform.position, Quaternion.identity); 
 		GetComponent<Animator>().SetTrigger("PopOut");
 		StartCoroutine(WaitForPopOut());
-
 	}
 
 	public void DestroyStar(){
+		ui_task.AddStarsToTotal(1);
 		Destroy(gameObject);
 	}
 		
@@ -56,11 +56,11 @@ public class StarAnimations : MonoBehaviour {
 
 			//ANIMATE ROTATION
 			rot = Vector3.Distance(lastPos, currentPos);
-			rotVector = new Vector3(0, 0, -rot*5);
+			rotVector = new Vector3(0, 0, Mathf.Clamp(-rot*15, -30f, 30f));
 			transform.rotation = Quaternion.Euler(rotVector);
 
 			//DESTROY WHEN NEAR
-			if (Vector3.Distance(transform.position, starGatherPointOnCompletedTask.position) <= 1f){
+			if (Vector3.Distance(transform.position, starGatherPointOnCompletedTask.position) <= 5f){
 				GetComponent<Animator>().SetTrigger("FadeOut");
 				StartCoroutine(DestroyAfterFadeOut());
 			}

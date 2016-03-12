@@ -5,9 +5,10 @@ using UnityEngine.UI;
 public class UITaskScriptManager : MonoBehaviour {
 
 	public EffectsManager effectManager;
-	public GameObject effectPrefab;
+	public RankManager rankManager;
 	public GameObject[] originalTasks;
 	public Text scoreCount;
+	int currentScore;
 	char splitter = ',';
 
 	public void UpdateTaskText(string taskString){
@@ -32,7 +33,10 @@ public class UITaskScriptManager : MonoBehaviour {
 			}
 		}
 
+		// We have got the score from the database, we need to save it and update the rank
+		currentScore = int.Parse(splittedCompletedTasks[splittedCompletedTasks.Length-1]);
 		scoreCount.text = splittedCompletedTasks[splittedCompletedTasks.Length-1];
+		rankManager.SpawnTheRank(currentScore);
 	}
 
 	public void DebugResetAllTodos(){
@@ -44,6 +48,8 @@ public class UITaskScriptManager : MonoBehaviour {
 			}
 		}
 		scoreCount.text = "0";
+		currentScore = 0;
+		rankManager.ResetRank();
 	}
 
 	public void ButtonClickOnTask(int buttonNumber){
@@ -55,8 +61,8 @@ public class UITaskScriptManager : MonoBehaviour {
 
 		originalTasks[buttonNumber-1].GetComponent<TaskStarManager>().AnimateTaskStar();
 
-		//TO BE CHANGED
-		//AddStarsToTotal(buttonNumber);
+		currentScore += buttonNumber;
+		rankManager.CheckForRankUpgrade(currentScore);
 	}
 
 	public void AddStarsToTotal(int score = 0){

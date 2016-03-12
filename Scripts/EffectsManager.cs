@@ -4,6 +4,8 @@ using System.Collections;
 public class EffectsManager : MonoBehaviour {
 
 	public GameObject[] starExplodeEffects;
+	public GameObject[] rankEffects;
+
 	public bool effectsEnabled = true;
 
 	public void CreateEffectAt(GameObject effect_GO, Vector3 pos, Quaternion rot){

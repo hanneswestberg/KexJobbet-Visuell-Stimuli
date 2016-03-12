@@ -4,7 +4,8 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 public class UILogInScriptManager : MonoBehaviour {
-	
+
+	public RankManager rankManager;
 	public Text inputFieldUserName;
 	public InputField inputFieldPassword;
 	public CanvasGroup logInCanvasGroup;
@@ -143,18 +144,25 @@ public class UILogInScriptManager : MonoBehaviour {
 	public void LogInToApplication(){
 		logInCanvasGroup.GetComponent<Animator>().SetTrigger("LogIn");
 		logInCanvasGroup.interactable = false;
+		logInCanvasGroup.blocksRaycasts = false;
 		logOutCanvasGroup.GetComponent<Animator>().SetTrigger("LogIn");
 		logOutCanvasGroup.interactable = true;
+		logOutCanvasGroup.blocksRaycasts = true;
 		tasksGroup.GetComponent<Animator>().SetTrigger("LogIn");
 		tasksGroup.interactable = true;
+		tasksGroup.blocksRaycasts = true;
 	}
 
 	public void LogOutFromApplication(){
 		logInCanvasGroup.GetComponent<Animator>().SetTrigger("LogOut");
 		logInCanvasGroup.interactable = true;
+		logInCanvasGroup.blocksRaycasts = true;
 		logOutCanvasGroup.GetComponent<Animator>().SetTrigger("LogOut");
 		logOutCanvasGroup.interactable = false;
+		logOutCanvasGroup.blocksRaycasts = false;
 		tasksGroup.GetComponent<Animator>().SetTrigger("LogOut");
 		tasksGroup.interactable = false;
+		tasksGroup.blocksRaycasts = false;
+		rankManager.DeSpawnTheRank();
 	}
 }
