@@ -16,10 +16,6 @@ public class RankManager : MonoBehaviour {
 	int currentRank = 0;
 	string standard_rank = "Du är rank: ";
 
-	// Use this for initialization
-	void Start () {
-	
-	}
 
 	public void SpawnTheRank(int score = 0){
 		if (effectManager.effectsEnabled == true){

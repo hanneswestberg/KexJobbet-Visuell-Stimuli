@@ -6,11 +6,15 @@ using UnityEngine.EventSystems;
 public class UILogInScriptManager : MonoBehaviour {
 
 	public RankManager rankManager;
+	public UITaskScriptManager uiTaskManager;
+
 	public Text inputFieldUserName;
 	public InputField inputFieldPassword;
-	public CanvasGroup logInCanvasGroup;
-	public CanvasGroup logOutCanvasGroup;
-	public CanvasGroup tasksGroup;
+	public CanvasGroup[] canvasGroupArray;
+	public CanvasGroup logInGroup;
+	public CanvasGroup task_1;
+	public CanvasGroup task_2;
+	public CanvasGroup task_3;
 	public GameObject wrongUsernameOrPasswordText_GO;
 	public GameObject logInButton_GO;
 	public GameObject rememberInfo_GO;
@@ -141,28 +145,36 @@ public class UILogInScriptManager : MonoBehaviour {
 		}
 	}
 
+	void CanvasGroupSetVisible(CanvasGroup canvasGroup, bool setVisible){
+		if(setVisible == true){
+			canvasGroup.GetComponent<Animator>().SetTrigger("LogIn");
+			canvasGroup.interactable = true;
+			canvasGroup.blocksRaycasts = true;
+		} else{
+			canvasGroup.GetComponent<Animator>().SetTrigger("LogOut");
+			canvasGroup.interactable = false;
+			canvasGroup.blocksRaycasts = false;
+		}
+	}
+
 	public void LogInToApplication(){
-		logInCanvasGroup.GetComponent<Animator>().SetTrigger("LogIn");
-		logInCanvasGroup.interactable = false;
-		logInCanvasGroup.blocksRaycasts = false;
-		logOutCanvasGroup.GetComponent<Animator>().SetTrigger("LogIn");
-		logOutCanvasGroup.interactable = true;
-		logOutCanvasGroup.blocksRaycasts = true;
-		tasksGroup.GetComponent<Animator>().SetTrigger("LogIn");
-		tasksGroup.interactable = true;
-		tasksGroup.blocksRaycasts = true;
+		CanvasGroupSetVisible(logInGroup, false);
+
+		foreach(CanvasGroup canvasGroup in canvasGroupArray){
+			CanvasGroupSetVisible(canvasGroup, true);
+		}
 	}
 
 	public void LogOutFromApplication(){
-		logInCanvasGroup.GetComponent<Animator>().SetTrigger("LogOut");
-		logInCanvasGroup.interactable = true;
-		logInCanvasGroup.blocksRaycasts = true;
-		logOutCanvasGroup.GetComponent<Animator>().SetTrigger("LogOut");
-		logOutCanvasGroup.interactable = false;
-		logOutCanvasGroup.blocksRaycasts = false;
-		tasksGroup.GetComponent<Animator>().SetTrigger("LogOut");
-		tasksGroup.interactable = false;
-		tasksGroup.blocksRaycasts = false;
+		CanvasGroupSetVisible(logInGroup, true);
+
+		foreach(CanvasGroup canvasGroup in canvasGroupArray){
+			CanvasGroupSetVisible(canvasGroup, false);
+		}
+
+		// Rank and stars
 		rankManager.DeSpawnTheRank();
+		uiTaskManager.DestroyAllStars();
+		uiTaskManager.DeSpawnTheTaskButtons();
 	}
 }

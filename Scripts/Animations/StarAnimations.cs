@@ -23,13 +23,16 @@ public class StarAnimations : MonoBehaviour {
 		starGatherPointOnCompletedTask = GameObject.Find("StarHolderGatherPoint").transform;
 		effectsManager = GameObject.Find("EffectsManager").GetComponent<EffectsManager>();
 		ui_task = GameObject.Find("TaskManager").GetComponent<UITaskScriptManager>();
-		StartEffects();
 	}
 
-	public void StartEffects(){
+	public void StartEffects(string animationName){
+		starGatherPointOnCompletedTask = GameObject.Find("StarHolderGatherPoint").transform;
+		effectsManager = GameObject.Find("EffectsManager").GetComponent<EffectsManager>();
+		ui_task = GameObject.Find("TaskManager").GetComponent<UITaskScriptManager>();
+
 		if(effectsManager.effectsEnabled == true){
-			GetComponent<Animator>().SetTrigger("Effects_enabled");
-			GetComponent<Animator>().Play("", 0, Random.Range(0f, 0.5f));
+			GetComponent<Animator>().SetTrigger(animationName);
+			//GetComponent<Animator>().Play("", 0, Random.Range(0f, 0.5f));
 		}
 	}
 
