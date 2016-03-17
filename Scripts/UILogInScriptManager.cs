@@ -7,14 +7,12 @@ public class UILogInScriptManager : MonoBehaviour {
 
 	public RankManager rankManager;
 	public UITaskScriptManager uiTaskManager;
-
+	public EffectsManager effectMan;
+	public Text welcomeText;
 	public Text inputFieldUserName;
 	public InputField inputFieldPassword;
 	public CanvasGroup[] canvasGroupArray;
 	public CanvasGroup logInGroup;
-	public CanvasGroup task_1;
-	public CanvasGroup task_2;
-	public CanvasGroup task_3;
 	public GameObject wrongUsernameOrPasswordText_GO;
 	public GameObject logInButton_GO;
 	public GameObject rememberInfo_GO;
@@ -28,13 +26,14 @@ public class UILogInScriptManager : MonoBehaviour {
 	int autoLogIn_int = 0;
 	int rememberInfo_int = 0;
 
+
+
 	void Start(){
 		system = EventSystem.current;
 		LoadUserInfo();
 	}
 
 	//HERE WE LOAD AND SAVE OUR COOKIES!!!
-
 	void LoadUserInfo(){
 		rememberInfo_int = (int)PlayerPrefs.GetInt("rememberInfo");
 
@@ -60,7 +59,7 @@ public class UILogInScriptManager : MonoBehaviour {
 			if(autoLogIn_int == 1){
 				autoLogIn_GO.GetComponent<Toggle>().isOn = true;
 
-				ButtonLogIn();
+				//ButtonLogIn();
 			}
 		}
 	}
@@ -81,7 +80,6 @@ public class UILogInScriptManager : MonoBehaviour {
 
 
 	// Manual keybindings
-
 	public void Update()
 	{
 		if(Input.GetKeyDown(KeyCode.Tab)){
@@ -103,7 +101,6 @@ public class UILogInScriptManager : MonoBehaviour {
 	}
 
 	// GUI callbacks
-
 	public void WrongUsernameOrPasswordTextPopUp(){
 		wrongUsernameOrPasswordText_GO.GetComponent<Animator>().Play("WrongUsernameOrPasswordAnimation", -1, 0f);
 		logInButton_GO.SetActive(enabled);
@@ -145,19 +142,40 @@ public class UILogInScriptManager : MonoBehaviour {
 		}
 	}
 
+
+	void CanvasGroupsSetAlpha(CanvasGroup[] canvasG, float newAlpha){
+		foreach(CanvasGroup canvasGroup in canvasG){
+			canvasGroup.alpha = newAlpha;
+		}
+	}
+
 	void CanvasGroupSetVisible(CanvasGroup canvasGroup, bool setVisible){
 		if(setVisible == true){
-			canvasGroup.GetComponent<Animator>().SetTrigger("LogIn");
 			canvasGroup.interactable = true;
 			canvasGroup.blocksRaycasts = true;
+
+			if(effectMan.effectsEnabled == true){
+				canvasGroup.GetComponent<Animator>().SetTrigger("LogIn");
+			}else{
+				canvasGroup.GetComponent<Animator>().enabled = false;
+				canvasGroup.alpha = 1;
+			}
+
 		} else{
-			canvasGroup.GetComponent<Animator>().SetTrigger("LogOut");
 			canvasGroup.interactable = false;
 			canvasGroup.blocksRaycasts = false;
+
+			if(effectMan.effectsEnabled == true){
+				canvasGroup.GetComponent<Animator>().SetTrigger("LogOut");
+			}else{
+				canvasGroup.GetComponent<Animator>().enabled = false;
+				canvasGroup.alpha = 0;
+			}
 		}
 	}
 
 	public void LogInToApplication(){
+		welcomeText.text = "Välkommen " + inputFieldUserName.text.ToUpperInvariant() + "!";
 		CanvasGroupSetVisible(logInGroup, false);
 
 		foreach(CanvasGroup canvasGroup in canvasGroupArray){
@@ -166,13 +184,14 @@ public class UILogInScriptManager : MonoBehaviour {
 	}
 
 	public void LogOutFromApplication(){
+		welcomeText.text = "Hej då " + inputFieldUserName.text.ToUpperInvariant() + "!";
 		CanvasGroupSetVisible(logInGroup, true);
 
 		foreach(CanvasGroup canvasGroup in canvasGroupArray){
 			CanvasGroupSetVisible(canvasGroup, false);
 		}
 
-		// Rank and stars
+		// Rank and stars reset
 		rankManager.DeSpawnTheRank();
 		uiTaskManager.DestroyAllStars();
 		uiTaskManager.DeSpawnTheTaskButtons();

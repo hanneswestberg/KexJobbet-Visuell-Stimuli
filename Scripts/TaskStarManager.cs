@@ -19,6 +19,7 @@ public class TaskStarManager : MonoBehaviour {
 	// Checks if effects are enabled, if not, then we want to disable animations
 	void Start(){
 		if(effectManager.effectsEnabled == false){
+			transform.GetComponent<Animator>().enabled = false;
 			transform.GetComponent<Button>().transition = Selectable.Transition.ColorTint;
 		}
 	}

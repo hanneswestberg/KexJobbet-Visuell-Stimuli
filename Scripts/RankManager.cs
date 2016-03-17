@@ -5,15 +5,17 @@ using UnityEngine.UI;
 public class RankManager : MonoBehaviour {
 
 	public EffectsManager effectManager;
-	public Text rankUIText;
+	public Text[] rankUITexts;
 	public GameObject rankHolder;
 	public Material rankMaterial;
+	public Image xpBarFiller;
+	public Image xpBarGlas;
 	public Texture[] rankTextures;
 	public Texture[] rankNormalMaps;
 
 	[SerializeField] private int[] rankScores = new int[]{0,6,12,18,24,30,36,42,48,54,60};
 	private string[] rankDescription = new string[]{"Icke-studerande Pleb", "Talanglös Musklickare", "Medioker Uppgiftsavklarare", "Aspirerande Höginkomsttagare"};
-	private string standard_rank = "Du är rank: ";
+	private string standard_rank = "";
 
 	private int currentRank = 0;
 	private int currentScore = 0;
@@ -42,8 +44,15 @@ public class RankManager : MonoBehaviour {
 		rankHolder.SetActive(false);
 	}
 
+	// Calculates the XP - Bar fill amount
+	public void CalculateXpBar(){
+		xpBarFiller.fillAmount = (currentScore % 4)/4f;
+		xpBarGlas.fillAmount = 1f - (currentScore % 4)/4f;
+	}
+
 	// Checks if we have reached a new rank, triggers when we have completed a new task
 	public void CheckForRankUpgrade(int score){
+		CalculateXpBar();
 		int temp = currentRank;
 		currentRank = CalculateRank(score);
 
@@ -61,7 +70,9 @@ public class RankManager : MonoBehaviour {
 	// Updates the visuals of the rank to represent our new rank
 	void UpdateRankVisuals(int rank){
 		currentRank = rank;
-		rankUIText.text = standard_rank + rankDescription[rank] + " (" + (rank+1).ToString() + ")";
+		rankUITexts[0].text = standard_rank + rankDescription[rank] + " (" + (rank+1).ToString() + ")";
+		rankUITexts[1].text = standard_rank + rankDescription[rank] + " (" + (rank+1).ToString() + ")";
+		rankUITexts[2].text = standard_rank + rankDescription[rank] + " (" + (rank+1).ToString() + ")";
 		rankMaterial.mainTexture = rankTextures[rank];
 		rankMaterial.SetTexture("_BumpMap", rankNormalMaps[rank]);
 	}

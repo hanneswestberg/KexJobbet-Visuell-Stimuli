@@ -55,7 +55,11 @@ public class UITaskScriptManager : MonoBehaviour {
 		rankManager.SpawnTheRank();
 
 		// We need to spawn the Task buttons
-		SpawnTheTaskButtons();
+		if(effectManager.effectsEnabled == true){
+			StartCoroutine(SpawnWaitForTaskWindowToEndAnimation(0.6f));
+		}else{
+			SpawnTheTaskButtons();
+		}
 	}
 
 	// Activates the buttons and plays the spawn animation if we have effects enabled
@@ -75,13 +79,7 @@ public class UITaskScriptManager : MonoBehaviour {
 
 	// Deactivates the buttons
 	public void DeSpawnTheTaskButtons(){
-		for (int i = 0; i < 6; i++) {
-			if(i < 3){
-				ToggleButtonVisible(originalTasks[i].transform.GetComponent<CanvasGroup>(), false, false);
-			} else{
-				ToggleButtonVisible(originalTasks[i].transform.GetComponent<CanvasGroup>(), false, true);
-			}
-		}
+		StartCoroutine(DeSpawnWaitForTaskWindowToEndAnimation(1f));
 	}
 
 	void ToggleButtonVisible(CanvasGroup canvasGroup, bool setVisible, bool isTomorrowsTask){
@@ -143,9 +141,7 @@ public class UITaskScriptManager : MonoBehaviour {
 
 	// Deleting all stars when logging out
 	public void DestroyAllStars(){
-		for (int i = 0; i < 3; i++) {
-			originalTasks[i].GetComponent<TaskStarManager>().DestroyAllStarsConnectedToTask();
-		}
+		StartCoroutine(DestroyAllStarsWait(1f));
 	}
 
 	// Updating our current score visually, occurs when a star has finished it's animation
@@ -169,4 +165,36 @@ public class UITaskScriptManager : MonoBehaviour {
 			yield return new WaitForSeconds(waitTime);
 		}
 	}
+
+	IEnumerator SpawnWaitForTaskWindowToEndAnimation(float waitTime){
+		yield return new WaitForSeconds(waitTime);
+		SpawnTheTaskButtons();
+	}
+
+	IEnumerator DeSpawnWaitForTaskWindowToEndAnimation(float waitTime){
+		if(effectManager.effectsEnabled == true){
+			yield return new WaitForSeconds(waitTime);
+		}
+
+		for (int i = 0; i < 6; i++) {
+			if(i < 3){
+				ToggleButtonVisible(originalTasks[i].transform.GetComponent<CanvasGroup>(), false, false);
+			} else{
+				ToggleButtonVisible(originalTasks[i].transform.GetComponent<CanvasGroup>(), false, true);
+			}
+		}
+
+	}
+
+	IEnumerator DestroyAllStarsWait(float waitTime){
+		if(effectManager.effectsEnabled == true){
+			yield return new WaitForSeconds(waitTime);
+		}
+
+		for (int i = 0; i < 3; i++) {
+			originalTasks[i].GetComponent<TaskStarManager>().DestroyAllStarsConnectedToTask();
+		}
+
+	}
+		
 }

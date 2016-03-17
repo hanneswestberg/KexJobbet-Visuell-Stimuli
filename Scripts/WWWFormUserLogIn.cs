@@ -42,7 +42,7 @@ public class WWWFormUserLogIn : MonoBehaviour {
 		}else{
 			if(download.text == "True"){
 				this.GetComponent<UILogInScriptManager>().LogInToApplication();
-				Debug.Log(download.text);
+				Debug.Log("Login Successful");
 				GameObject.Find("TaskManager").GetComponent<WWWFormTasks>().RequestTasksFromDatabase();
 			}else{
 				Debug.Log(download.text);
