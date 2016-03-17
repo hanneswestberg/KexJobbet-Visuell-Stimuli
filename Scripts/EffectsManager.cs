@@ -8,6 +8,8 @@ public class EffectsManager : MonoBehaviour {
 
 	public bool effectsEnabled = true;
 
+
+	// Creates an effect and places it at a certain position
 	public void CreateEffectAt(GameObject effect_GO, Vector3 pos, Quaternion rot){
 		if (effectsEnabled == true){
 			GameObject effect = (GameObject)GameObject.Instantiate(effect_GO, pos, rot);
@@ -17,6 +19,7 @@ public class EffectsManager : MonoBehaviour {
 		}
 	}
 
+	// Destroys an effect when it is done
 	IEnumerator DestroyEffectWhenDone(GameObject effect, float effectDuration){
 		yield return new WaitForSeconds(effectDuration);
 		Destroy(effect);

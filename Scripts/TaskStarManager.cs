@@ -9,20 +9,15 @@ public class TaskStarManager : MonoBehaviour {
 	public Text taskText;
 	public GameObject starPrefab;
 	public Transform starHolder;
-	public bool isTomorrowsTask;
-	int numberOfChilds = 0;
+	[SerializeField] private bool isTomorrowsTask;
 
-	Vector3[] starPos_1 = new Vector3[]{new Vector3(0, 0, 0)};
-	Vector3[] starPos_2 = new Vector3[]{new Vector3(-16, 0, 0), new Vector3(17, 0, 0)};
-	Vector3[] starPos_3 = new Vector3[]{new Vector3(-15, 8, 0), new Vector3(16, 8, 0), new Vector3(0, -15, 0)};
-	List<Vector3[]> starPosList = new List<Vector3[]>();
+	private List<Vector3[]> starPosList = new List<Vector3[]>(){
+		new Vector3[]{new Vector3(0, 0, 0)}, 
+		new Vector3[]{new Vector3(-16, 0, 0), new Vector3(17, 0, 0)},
+		new Vector3[]{new Vector3(-15, 8, 0), new Vector3(16, 8, 0), new Vector3(0, -15, 0)}};
 
-
+	// Checks if effects are enabled, if not, then we want to disable animations
 	void Start(){
-		starPosList.Add(starPos_1);
-		starPosList.Add(starPos_2);
-		starPosList.Add(starPos_3);
-
 		if(effectManager.effectsEnabled == false){
 			transform.GetComponent<Button>().transition = Selectable.Transition.ColorTint;
 		}
@@ -34,17 +29,18 @@ public class TaskStarManager : MonoBehaviour {
 		}
 	}
 
-
+	// Spawns stars for this task
 	public void CreateTaskStars(int starCount){
 		for (int i = 0; i < starCount; i++) {
 			GameObject star = (GameObject)GameObject.Instantiate(starPrefab, this.transform.position, Quaternion.identity);
 			star.transform.SetParent(starHolder);
+			star.name = "Star_" + (i+1).ToString();
 			star.transform.localPosition = starPosList[starCount-1][i];
 		}
 	}
 
 	public void AnimateTaskStar(){
-		numberOfChilds = 0;
+		int numberOfChilds = 0;
 		foreach(Transform child in starHolder){
 			if(effectManager.effectsEnabled == true){
 				StartCoroutine(PopOutQue(child, numberOfChilds));

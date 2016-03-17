@@ -8,8 +8,15 @@ public class UITaskScriptManager : MonoBehaviour {
 	public RankManager rankManager;
 	public GameObject[] originalTasks;
 	public Text scoreCount;
-	int currentScore;
 	char splitter = ',';
+
+	Animator[] taskAnimators = new Animator[]{};
+
+	// Creates an array of all the task animators
+	void Start(){
+		taskAnimators = new Animator[]{originalTasks[0].GetComponent<Animator>(), originalTasks[1].GetComponent<Animator>(), originalTasks[2].GetComponent<Animator>(),
+			originalTasks[3].GetComponent<Animator>(), originalTasks[4].GetComponent<Animator>(), originalTasks[5].GetComponent<Animator>()};
+	}
 
 	// We have recieved task information from the database
 	public void UpdateTaskText(string taskString){
@@ -26,13 +33,14 @@ public class UITaskScriptManager : MonoBehaviour {
 	public void UpdateCompletedTasksFromDatabase(string completedTaskString){
 		string[] splittedCompletedTasks = completedTaskString.Split(splitter);
 
-		// Spawn stars for the uncompleted tasks
+		// Activates the buttons and spawn stars for the uncompleted tasks
 		for (int i = 0; i < (splittedCompletedTasks.Length-1); i++) {
 			if (splittedCompletedTasks[i] == "0"){
 				originalTasks[i].GetComponent<Button>().interactable = true;
 				originalTasks[i].GetComponent<TaskStarManager>().CreateTaskStars(i+1);
 			}else{
 				originalTasks[i].GetComponent<Button>().interactable = false;
+
 			}
 		}
 
@@ -42,21 +50,19 @@ public class UITaskScriptManager : MonoBehaviour {
 		}
 
 		// We have got the score from the database, we need to save it and update the rank
-		currentScore = int.Parse(splittedCompletedTasks[splittedCompletedTasks.Length-1]);
+		rankManager.CurrentScore = int.Parse(splittedCompletedTasks[splittedCompletedTasks.Length-1]);
 		scoreCount.text = splittedCompletedTasks[splittedCompletedTasks.Length-1];
-		rankManager.SpawnTheRank(currentScore);
+		rankManager.SpawnTheRank();
 
 		// We need to spawn the Task buttons
 		SpawnTheTaskButtons();
 	}
 
-	// Time to spawn the buttons
+	// Activates the buttons and plays the spawn animation if we have effects enabled
 	void SpawnTheTaskButtons(){
-		if (effectManager.effectsEnabled == true){
-			StartCoroutine(PlayAnimationsQue(new Animator[]{originalTasks[0].GetComponent<Animator>(), originalTasks[1].GetComponent<Animator>(), originalTasks[2].GetComponent<Animator>(),
-				originalTasks[3].GetComponent<Animator>(), originalTasks[4].GetComponent<Animator>(), originalTasks[5].GetComponent<Animator>(),}
-				, "TaskButtons_PopInRight", 0.2f));
-		} else{
+		if (effectManager.effectsEnabled == true){ // If we have effects enabled, then we want to start animation
+			StartCoroutine(PlayAnimationsQue(taskAnimators, "TaskButtons_PopInRight", 0.2f));
+		} else{ 
 			for (int i = 0; i < 6; i++) {
 				if(i < 3){
 					ToggleButtonVisible(originalTasks[i].transform.GetComponent<CanvasGroup>(), true, false);
@@ -67,6 +73,7 @@ public class UITaskScriptManager : MonoBehaviour {
 		}
 	}
 
+	// Deactivates the buttons
 	public void DeSpawnTheTaskButtons(){
 		for (int i = 0; i < 6; i++) {
 			if(i < 3){
@@ -115,7 +122,7 @@ public class UITaskScriptManager : MonoBehaviour {
 
 		// Resets our internal score and the visual rank
 		scoreCount.text = "0";
-		currentScore = 0;
+		rankManager.CurrentScore = 0;
 		rankManager.ResetRank();
 		SpawnTheTaskButtons();
 	}
@@ -131,8 +138,7 @@ public class UITaskScriptManager : MonoBehaviour {
 		originalTasks[buttonNumber-1].GetComponent<TaskStarManager>().AnimateTaskStar();
 
 		// We also need to keep track of score and update the visual rank
-		currentScore += buttonNumber;
-		rankManager.CheckForRankUpgrade(currentScore);
+		rankManager.CurrentScore += buttonNumber;
 	}
 
 	// Deleting all stars when logging out
@@ -144,7 +150,10 @@ public class UITaskScriptManager : MonoBehaviour {
 
 	// Updating our current score visually, occurs when a star has finished it's animation
 	public void AddStarsToTotal(int score = 0){
-		scoreCount.text = (int.Parse(scoreCount.text) + score).ToString();
+		if(rankManager.CurrentScore >= (int.Parse(scoreCount.text) + score)){
+			scoreCount.text = (int.Parse(scoreCount.text) + score).ToString();
+			rankManager.CheckForRankUpgrade(int.Parse(scoreCount.text));
+		}
 	}
 
 

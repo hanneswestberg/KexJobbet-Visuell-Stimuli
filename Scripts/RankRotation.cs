@@ -5,45 +5,37 @@ public class RankRotation : MonoBehaviour {
 
 	public GameObject rankPlane;
 	public LayerMask mask;
-	public GameObject rankLight;
 
+	[SerializeField] private float maxRotAngle = 15f;
+	[SerializeField] private float reactDistance = 0.25f;
+	[Range(0.01f, 1f)] public float reactSpeed = 0.05f;
 
-	Vector3 orginalRot = new Vector3(90f, 200f, 0f);
+	Vector3 orginalRot;
 	float planeRotX;
 	float planeRotY;
-	Vector3 planeRotVector;
 	Vector3 point;
 	Ray ray;
 	RaycastHit hit;
-	float maxRotAngle = 15f;
 
-
-	Vector3 lightPos;
+	void Start(){
+		orginalRot = transform.rotation.eulerAngles;
+	}
 
 	void Update () {
+		// Casts a ray to the cursorPlane and calculates the rotation of the rank
 		ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 		if(Physics.Raycast(ray, out hit, 100f, mask)){
 			point = hit.transform.InverseTransformPoint(hit.point);
 
 			// Rank Rotation:
-			if (point.magnitude <= 0.25f){
+			if (point.magnitude <= reactDistance){
 				planeRotX = orginalRot.x + Mathf.Clamp(point.z*maxRotAngle*10, -maxRotAngle, maxRotAngle);
 				planeRotY = orginalRot.y + Mathf.Clamp(point.x*maxRotAngle*10, -maxRotAngle, maxRotAngle);
 
-				rankPlane.transform.rotation = Quaternion.Lerp(rankPlane.transform.rotation, Quaternion.Euler(planeRotX, planeRotY, 0f), 0.05f);
+				rankPlane.transform.rotation = Quaternion.Lerp(rankPlane.transform.rotation, Quaternion.Euler(planeRotX, planeRotY, 0f), reactSpeed);
 			}else{
-				rankPlane.transform.rotation = Quaternion.Lerp(rankPlane.transform.rotation, Quaternion.Euler(orginalRot), 0.05f);
+				rankPlane.transform.rotation = Quaternion.Lerp(rankPlane.transform.rotation, Quaternion.Euler(orginalRot), reactSpeed);
 			}
-
-
-
-
-
-			// Light Position:
-			//lightPos = new Vector3(point.x, 30f,point.z);
-			//lightPos = hit.transform.TransformPoint(lightPos);
-
-			//rankLight.transform.position = lightPos;
 		}
 	}
 }
