@@ -7,7 +7,7 @@ public class RankRotation : MonoBehaviour {
 	public LayerMask mask;
 
 	[SerializeField] private float maxRotAngle = 15f;
-	[SerializeField] private float reactDistance = 0.25f;
+	[SerializeField] private float reactDistance = 5f;
 	[Range(0.01f, 1f)] public float reactSpeed = 0.05f;
 
 	Vector3 orginalRot;
@@ -19,6 +19,7 @@ public class RankRotation : MonoBehaviour {
 
 	void Start(){
 		orginalRot = transform.rotation.eulerAngles;
+		reactDistance = 5f;
 	}
 
 	void Update () {

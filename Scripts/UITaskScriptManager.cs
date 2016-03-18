@@ -138,8 +138,6 @@ public class UITaskScriptManager : MonoBehaviour {
 
 		// We also need to keep track of score and update the visual rank
 		rankManager.CurrentScore += buttonNumber;
-		Debug.Log(rankManager.CurrentScore);
-
 	}
 
 	// Deleting all stars when logging out

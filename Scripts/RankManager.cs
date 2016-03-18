@@ -13,7 +13,10 @@ public class RankManager : MonoBehaviour {
 	public Texture[] rankNormalMaps;
 
 	[SerializeField] private int[] rankScores = new int[]{0,6,12,18,24,30,36,42,48,54,60};
-	private string[] rankDescription = new string[]{"Icke-studerande Pleb", "Talanglös Musklickare", "Medioker Uppgiftsavklarare", "Aspirerande Höginkomsttagare"};
+	private string[] rankDescription = new string[]{"Ickestuderande NØllan", "Talanglös Musklickare", "Lortig Distansstuderare", "Vredig Medietekniksinspirerare", 
+		"Tillfälligt Förekommande Skolvisiterare", "Medelmåttig Uppgiftsavklarare", "Medioker Applikationsstartare", "Andfådd Föreläsningsgåare", 
+		"Gynnsam Lunchätare", "Lovande Applikationsanvändare", "Förtroendeingivande Kexjobbsdeltagare", "Eftersträvande Ingenjörsefterföljare", "Aspirerande Höginkomsttagare", 
+		"Intellektuell Akademiutövare", "Ultimat Att-göragörare"};
 	private string standard_rank = "";
 
 	private int currentRank = 0;
