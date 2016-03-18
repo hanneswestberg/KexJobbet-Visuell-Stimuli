@@ -8,8 +8,7 @@ public class RankManager : MonoBehaviour {
 	public Text[] rankUITexts;
 	public GameObject rankHolder;
 	public Material rankMaterial;
-	public Image xpBarFiller;
-	public Image xpBarGlas;
+	public XPBarAnimator xpBarAnim;
 	public Texture[] rankTextures;
 	public Texture[] rankNormalMaps;
 
@@ -37,6 +36,7 @@ public class RankManager : MonoBehaviour {
 			UpdateRankVisuals(currentRank);
 			rankHolder.SetActive(true);
 		}
+		CalculateXpBar(currentScore);
 	}
 
 	// Deactivates the rank, triggers when logging out
@@ -45,14 +45,12 @@ public class RankManager : MonoBehaviour {
 	}
 
 	// Calculates the XP - Bar fill amount
-	public void CalculateXpBar(){
-		xpBarFiller.fillAmount = (currentScore % 4)/4f;
-		xpBarGlas.fillAmount = 1f - (currentScore % 4)/4f;
+	public void CalculateXpBar(int score){
+		xpBarAnim.SetFillAmount((score % 4)/4f);
 	}
 
 	// Checks if we have reached a new rank, triggers when we have completed a new task
 	public void CheckForRankUpgrade(int score){
-		CalculateXpBar();
 		int temp = currentRank;
 		currentRank = CalculateRank(score);
 
@@ -65,6 +63,8 @@ public class RankManager : MonoBehaviour {
 	// Resets the rank to the lowest, triggers when clicking on 'DEBUG_RESETALL' button
 	public void ResetRank(){
 		UpdateRankVisuals(0);
+		xpBarAnim.ResetFillAmount();
+
 	}
 
 	// Updates the visuals of the rank to represent our new rank

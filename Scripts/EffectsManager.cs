@@ -1,13 +1,22 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public class EffectsManager : MonoBehaviour {
 
 	public GameObject[] starExplodeEffects;
 	public GameObject[] rankEffects;
 
+	public Text textEffectEnabled;
 	public bool effectsEnabled = true;
 
+	void Start(){
+		if (effectsEnabled == true){
+			textEffectEnabled.text = "Effekter är: På";
+		} else{
+			textEffectEnabled.text = "Effekter är: Av";
+		}
+	}
 
 	// Creates an effect and places it at a certain position
 	public void CreateEffectAt(GameObject effect_GO, Vector3 pos, Quaternion rot){

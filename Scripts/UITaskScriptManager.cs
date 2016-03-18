@@ -120,6 +120,7 @@ public class UITaskScriptManager : MonoBehaviour {
 
 		// Resets our internal score and the visual rank
 		scoreCount.text = "0";
+
 		rankManager.CurrentScore = 0;
 		rankManager.ResetRank();
 		SpawnTheTaskButtons();
@@ -137,6 +138,8 @@ public class UITaskScriptManager : MonoBehaviour {
 
 		// We also need to keep track of score and update the visual rank
 		rankManager.CurrentScore += buttonNumber;
+		Debug.Log(rankManager.CurrentScore);
+
 	}
 
 	// Deleting all stars when logging out
@@ -146,10 +149,18 @@ public class UITaskScriptManager : MonoBehaviour {
 
 	// Updating our current score visually, occurs when a star has finished it's animation
 	public void AddStarsToTotal(int score = 0){
-		if(rankManager.CurrentScore >= (int.Parse(scoreCount.text) + score)){
+		if(effectManager.effectsEnabled == true){
+			if(rankManager.CurrentScore >= (int.Parse(scoreCount.text) + score)){
+				rankManager.CalculateXpBar(int.Parse(scoreCount.text)+ score);
+				scoreCount.text = (int.Parse(scoreCount.text) + score).ToString();
+				rankManager.CheckForRankUpgrade(int.Parse(scoreCount.text));
+			}
+		} else{
+			rankManager.CalculateXpBar(int.Parse(scoreCount.text)+ score);
 			scoreCount.text = (int.Parse(scoreCount.text) + score).ToString();
 			rankManager.CheckForRankUpgrade(int.Parse(scoreCount.text));
 		}
+
 	}
 
 
@@ -183,7 +194,7 @@ public class UITaskScriptManager : MonoBehaviour {
 				ToggleButtonVisible(originalTasks[i].transform.GetComponent<CanvasGroup>(), false, true);
 			}
 		}
-
+		rankManager.ResetRank();
 	}
 
 	IEnumerator DestroyAllStarsWait(float waitTime){
