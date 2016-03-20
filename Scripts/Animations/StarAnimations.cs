@@ -37,7 +37,7 @@ public class StarAnimations : MonoBehaviour {
 	}
 
 	public void PopOutEffect(){
-		effectsManager.CreateEffectAt(effectsManager.starExplodeEffects[0], transform.position, Quaternion.identity); 
+		effectsManager.CreateEffectAt(effectsManager.starExplodeEffects[0], transform.position); 
 		GetComponent<Animator>().SetTrigger("PopOut");
 		StartCoroutine(WaitForPopOut());
 	}

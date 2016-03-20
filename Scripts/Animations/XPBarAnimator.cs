@@ -5,12 +5,16 @@ using UnityEngine.UI;
 public class XPBarAnimator : MonoBehaviour {
 
 	public EffectsManager effectMan;
+
 	private float fillAmount;
 	public Image xpFiller;
 	public Image xpGlas;
 
 	private bool hasChanged;
 	private bool firstStart;
+	private int currentXPBarQue = 0;
+	private int currentScore = 0;
+	private float tempFillAmount = 0f;
 
 	void Start(){
 		firstStart = true;
@@ -34,8 +38,12 @@ public class XPBarAnimator : MonoBehaviour {
 	}
 
 	public void SetFillAmount(float amount){
-		fillAmount = amount;
-		hasChanged = true;
+		if (fillAmount != 1) {
+			fillAmount = amount;
+			hasChanged = true;
+		} else {
+			tempFillAmount = amount;
+		}
 
 		if(amount == 0 && firstStart == false){
 			hasChanged = false;
@@ -44,12 +52,43 @@ public class XPBarAnimator : MonoBehaviour {
 		firstStart = false;
 	}
 
+	public void AddToXPBarQue(int newScore){
+		if (currentXPBarQue == 0) {
+			currentXPBarQue = (newScore - currentScore);
+			StartCoroutine (XPBarQueAnimator ());
+		} else {
+			currentXPBarQue = (newScore - currentScore);
+		}
+	}
+
+	// Calculates the XP - Bar fill amount
+	void CalculateXpBar(int score){
+		SetFillAmount((score % 4)/4f);
+	}
+
 	IEnumerator LevelUpAnimation(){
 		fillAmount = 1f;
-		yield return new WaitForSeconds(0.5f);
+		effectMan.CreateEffectAt (effectMan.rankEffects [0], transform.position);
+		yield return new WaitForSeconds(1f);
 		
 			if(hasChanged == false){
-				fillAmount = 0f;
+			xpFiller.fillAmount = 0f;
+			xpGlas.fillAmount = 1f;
+			fillAmount = tempFillAmount;
+			tempFillAmount = 0f;
 			}
+	}
+
+	IEnumerator XPBarQueAnimator(){
+		currentScore++;
+		CalculateXpBar (currentScore);
+
+		yield return new WaitForSeconds (0.3f);
+		currentXPBarQue--;
+
+		Debug.Log ("Current tracked score is: " + currentScore + "\t Current que is: " + currentXPBarQue);
+		if (currentXPBarQue > 0) {
+			StartCoroutine(XPBarQueAnimator());
+		}
 	}
 }

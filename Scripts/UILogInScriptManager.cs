@@ -12,18 +12,17 @@ public class UILogInScriptManager : MonoBehaviour {
 	public Text inputFieldUserName;
 	public InputField inputFieldPassword;
 	public CanvasGroup[] canvasGroupArray;
-	public CanvasGroup logInGroup;
+	public CanvasGroup[] logInGroups;
+	public GameObject[] cheatButtons;
 	public GameObject wrongUsernameOrPasswordText_GO;
 	public GameObject logInButton_GO;
 	public GameObject rememberInfo_GO;
-	public GameObject autoLogIn_GO;
 
 	EventSystem system;
 
 	//LOCAL COOKIE SAVES
 	string username = "";
 	string password = "";
-	int autoLogIn_int = 0;
 	int rememberInfo_int = 0;
 
 
@@ -40,7 +39,6 @@ public class UILogInScriptManager : MonoBehaviour {
 		if(rememberInfo_int == 1){
 			username = (string)PlayerPrefs.GetString("username");
 			password = (string)PlayerPrefs.GetString("password");
-			autoLogIn_int = (int)PlayerPrefs.GetInt("autoLogIn");
 
 			// We need to update our text on field inputs:
 
@@ -55,12 +53,6 @@ public class UILogInScriptManager : MonoBehaviour {
 			if(rememberInfo_int == 1){
 				rememberInfo_GO.GetComponent<Toggle>().isOn = true;
 			}
-				
-			if(autoLogIn_int == 1){
-				autoLogIn_GO.GetComponent<Toggle>().isOn = true;
-
-				//ButtonLogIn();
-			}
 		}
 	}
 
@@ -68,14 +60,12 @@ public class UILogInScriptManager : MonoBehaviour {
 		PlayerPrefs.SetString("username", (string)inputFieldUserName.text);
 		PlayerPrefs.SetString("password", (string)inputFieldPassword.text);
 		PlayerPrefs.SetInt("rememberInfo", (int)rememberInfo_int);
-		PlayerPrefs.SetInt("autoLogIn", (int)autoLogIn_int);
 	}
 		
 	void ResetInfo(){
 		PlayerPrefs.SetString("username", "");
 		PlayerPrefs.SetString("password", "");
 		PlayerPrefs.SetInt("rememberInfo", 0);
-		PlayerPrefs.SetInt("autoLogIn", 0);
 	}
 
 
@@ -121,14 +111,6 @@ public class UILogInScriptManager : MonoBehaviour {
 			rememberInfo_int = 0;
 		}
 	}
-
-	public void ToggleAutoLogIn(){
-		if(autoLogIn_int == 0){
-			autoLogIn_int = 1;
-		}else{
-			autoLogIn_int = 0;
-		}
-	}
 		
 	public void ButtonLogIn(){
 		this.GetComponent<WWWFormUserLogIn>().SendLogInInfo();
@@ -140,6 +122,10 @@ public class UILogInScriptManager : MonoBehaviour {
 		}else{
 			ResetInfo();
 		}
+	}
+
+	public void ButtonQuitApplication(){
+		Application.Quit ();
 	}
 
 
@@ -176,24 +162,46 @@ public class UILogInScriptManager : MonoBehaviour {
 
 	public void LogInToApplication(){
 		welcomeText.text = "Välkommen " + inputFieldUserName.text.ToUpperInvariant() + "!";
-		CanvasGroupSetVisible(logInGroup, false);
+
+		foreach(CanvasGroup logInGroup in logInGroups){
+			CanvasGroupSetVisible(logInGroup, false);
+		}
 
 		foreach(CanvasGroup canvasGroup in canvasGroupArray){
 			CanvasGroupSetVisible(canvasGroup, true);
 		}
+
+		CheckIfTestUser (inputFieldUserName.text);
 	}
 
 	public void LogOutFromApplication(){
 		welcomeText.text = "Hej då " + inputFieldUserName.text.ToUpperInvariant() + "!";
-		CanvasGroupSetVisible(logInGroup, true);
+
+		foreach(CanvasGroup logInGroup in logInGroups){
+			CanvasGroupSetVisible(logInGroup, true);
+		}
 
 		foreach(CanvasGroup canvasGroup in canvasGroupArray){
 			CanvasGroupSetVisible(canvasGroup, false);
 		}
 
 		// Rank and stars reset
+		ToggleCheatButtons(false);
 		rankManager.DeSpawnTheRank();
 		uiTaskManager.DestroyAllStars();
 		uiTaskManager.DeSpawnTheTaskButtons();
+	}
+
+	// Checks if the user is able to use the cheat buttons
+	void CheckIfTestUser(string user){
+		if (user == "Hannes") {
+			ToggleCheatButtons (true);
+		}
+	}
+
+	void ToggleCheatButtons(bool active){
+		foreach(GameObject cheatButton in cheatButtons){
+			cheatButton.SetActive (active);
+		}
 	}
 }

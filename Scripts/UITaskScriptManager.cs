@@ -7,6 +7,9 @@ public class UITaskScriptManager : MonoBehaviour {
 	public EffectsManager effectManager;
 	public RankManager rankManager;
 	public GameObject[] originalTasks;
+	public CanvasGroup[] tutorialGroup;
+	public CanvasGroup tutorialParentGroup;
+	public CanvasGroup motivationParentGroup;
 	public Text scoreCount;
 	char splitter = ',';
 
@@ -82,6 +85,7 @@ public class UITaskScriptManager : MonoBehaviour {
 		StartCoroutine(DeSpawnWaitForTaskWindowToEndAnimation(1f));
 	}
 
+	// Toggles a canvasgroup visibility
 	void ToggleButtonVisible(CanvasGroup canvasGroup, bool setVisible, bool isTomorrowsTask){
 		if(setVisible == true){
 			canvasGroup.alpha = 1f;
@@ -147,18 +151,112 @@ public class UITaskScriptManager : MonoBehaviour {
 
 	// Updating our current score visually, occurs when a star has finished it's animation
 	public void AddStarsToTotal(int score = 0){
+		int newScore = (int.Parse (scoreCount.text) + score);
 		if(effectManager.effectsEnabled == true){
-			if(rankManager.CurrentScore >= (int.Parse(scoreCount.text) + score)){
-				rankManager.CalculateXpBar(int.Parse(scoreCount.text)+ score);
-				scoreCount.text = (int.Parse(scoreCount.text) + score).ToString();
-				rankManager.CheckForRankUpgrade(int.Parse(scoreCount.text));
+			if(rankManager.CurrentScore >= newScore){
+				rankManager.CalculateXpBar(newScore);
+				scoreCount.text = newScore.ToString();
+				rankManager.CheckForRankUpgrade(newScore);
 			}
 		} else{
-			rankManager.CalculateXpBar(int.Parse(scoreCount.text)+ score);
-			scoreCount.text = (int.Parse(scoreCount.text) + score).ToString();
-			rankManager.CheckForRankUpgrade(int.Parse(scoreCount.text));
+			rankManager.CalculateXpBar(newScore);
+			scoreCount.text = newScore.ToString();
+			rankManager.CheckForRankUpgrade(newScore);
 		}
 
+	}
+
+	public void CheatAddStars(){
+		rankManager.CurrentScore += 1;
+		AddStarsToTotal (1);
+	}
+
+	public void MotivationQuestionStart (){
+		if (motivationParentGroup.interactable == false) {
+			motivationParentGroup.interactable = true;
+			motivationParentGroup.blocksRaycasts = true;
+
+			if(effectManager.effectsEnabled == true){
+				motivationParentGroup.GetComponent<Animator>().SetTrigger("PopIn");
+			}else{
+				motivationParentGroup.GetComponent<Animator>().enabled = false;
+				motivationParentGroup.alpha = 1;
+			}
+		}
+	}
+
+	public void MotivationQuestionQuit(){
+		if (motivationParentGroup.interactable == true) {
+			motivationParentGroup.interactable = false;
+			motivationParentGroup.blocksRaycasts = false;
+
+			if(effectManager.effectsEnabled == true){
+				motivationParentGroup.GetComponent<Animator>().SetTrigger("PopOut");
+			}else{
+				motivationParentGroup.GetComponent<Animator>().enabled = false;
+				motivationParentGroup.alpha = 0;
+			}
+		}
+	}
+
+	public void MotivationQuestionSave(int motivationAmount){
+		// SAVE SHIT HERE
+		MotivationQuestionQuit ();
+	}
+
+	public void TutorialStart(){
+		if (tutorialParentGroup.interactable == false) {
+			tutorialParentGroup.interactable = true;
+			tutorialParentGroup.blocksRaycasts = true;
+			TutorialShowTip (0);
+		}
+	}
+
+	public void TutorialShowTip(int tipNumber){
+		foreach (CanvasGroup canvasGroup in tutorialGroup) {
+			if (canvasGroup.interactable == true) {
+				TutorialSetVisible (canvasGroup, false);
+			}
+		}
+
+		TutorialSetVisible(tutorialGroup[tipNumber], true);
+	}
+
+	void TutorialSetVisible( CanvasGroup canvasGroup, bool active){
+		if(active == true){
+			canvasGroup.interactable = true;
+			canvasGroup.blocksRaycasts = true;
+
+			if(effectManager.effectsEnabled == true){
+				canvasGroup.GetComponent<Animator>().SetTrigger("PopIn");
+			}else{
+				canvasGroup.GetComponent<Animator>().enabled = false;
+				canvasGroup.alpha = 1;
+			}
+
+		} else{
+			canvasGroup.interactable = false;
+			canvasGroup.blocksRaycasts = false;
+
+			if(effectManager.effectsEnabled == true){
+				//Debug.Log (canvasGroup.name);
+				canvasGroup.GetComponent<Animator>().SetTrigger("PopOut");
+			}else{
+				canvasGroup.GetComponent<Animator>().enabled = false;
+				canvasGroup.alpha = 0;
+			}
+		}
+	}
+
+	public void TutorialQuit(){
+		tutorialParentGroup.interactable = false;
+		tutorialParentGroup.blocksRaycasts = false;
+
+		foreach (CanvasGroup canvasGroup in tutorialGroup) {
+			if (canvasGroup.interactable == true) {
+				TutorialSetVisible (canvasGroup, false);
+			}
+		}
 	}
 
 
