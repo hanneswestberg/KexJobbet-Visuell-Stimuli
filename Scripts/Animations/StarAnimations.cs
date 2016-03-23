@@ -19,6 +19,9 @@ public class StarAnimations : MonoBehaviour {
 	float rot;
 	Vector3 rotVector;
 
+	// Animations
+	bool isFading = false;
+
 	void Start(){
 		starGatherPointOnCompletedTask = GameObject.Find("StarHolderGatherPoint").transform;
 		effectsManager = GameObject.Find("EffectsManager").GetComponent<EffectsManager>();
@@ -63,7 +66,8 @@ public class StarAnimations : MonoBehaviour {
 			transform.rotation = Quaternion.Euler(rotVector);
 
 			//DESTROY WHEN NEAR
-			if (Vector3.Distance(transform.position, starGatherPointOnCompletedTask.position) <= 5f){
+			if (Vector3.Distance(transform.position, starGatherPointOnCompletedTask.position) <= 5f && isFading == false){
+				isFading = true;
 				GetComponent<Animator>().SetTrigger("FadeOut");
 				StartCoroutine(DestroyAfterFadeOut());
 			}
@@ -76,6 +80,7 @@ public class StarAnimations : MonoBehaviour {
 	}
 
 	IEnumerator DestroyAfterFadeOut(){
+		effectsManager.CreateEffectAt(effectsManager.starExplodeEffects[1], effectsManager.starCountEffectPosition);
 		yield return new WaitForSeconds(0.5f);
 		ui_task.AddStarsToTotal(1);
 		Destroy(this.gameObject);

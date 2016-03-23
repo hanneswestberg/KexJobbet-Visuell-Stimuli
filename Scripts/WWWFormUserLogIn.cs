@@ -45,7 +45,6 @@ public class WWWFormUserLogIn : MonoBehaviour {
 				Debug.Log("Login Successful");
 				GameObject.Find("TaskManager").GetComponent<WWWFormTasks>().RequestTasksFromDatabase();
 			}else{
-				Debug.Log(download.text);
 				this.GetComponent<UILogInScriptManager>().WrongUsernameOrPasswordTextPopUp();
 			}
 		}

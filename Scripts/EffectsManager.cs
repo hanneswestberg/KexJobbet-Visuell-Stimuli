@@ -7,15 +7,12 @@ public class EffectsManager : MonoBehaviour {
 	public GameObject[] starExplodeEffects;
 	public GameObject[] rankEffects;
 
-	public Text textEffectEnabled;
+	[HideInInspector] public Vector3 starCountEffectPosition = new Vector3(9.18f, -3.7f, 0f);
+
 	public bool effectsEnabled = true;
 
 	void Start(){
-		if (effectsEnabled == true){
-			textEffectEnabled.text = "Effekter är: På";
-		} else{
-			textEffectEnabled.text = "Effekter är: Av";
-		}
+
 	}
 
 	// Creates an effect and places it at a certain position
@@ -24,7 +21,7 @@ public class EffectsManager : MonoBehaviour {
 			GameObject effect = (GameObject)GameObject.Instantiate(effect_GO, pos, rot);
 			effect.transform.SetParent(this.transform);
 			effect.name = "Particle_Effect";
-			effect.layer = 8;
+			effect.layer = 10;
 			StartCoroutine(DestroyEffectWhenDone(effect, effect.GetComponent<ParticleSystem>().duration));
 		}
 	}

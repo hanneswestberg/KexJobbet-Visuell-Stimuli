@@ -25,6 +25,10 @@ public class WWWFormTasks : MonoBehaviour {
 	public void ResetAllTasks(){
 		StartCoroutine(ResetAllTodosIEnumerator());
 	}
+
+	public void SendMotivationCheck(int motivationAmount){
+		StartCoroutine(SendMotivationCheckIEnumerator(motivationAmount));
+	}
 		
 	IEnumerator RequestTasksFromDatabaseIEnumerator(){
 		WWW downloadedTaskData = new WWW(database_url + "?getTodos=1");
@@ -54,8 +58,24 @@ public class WWWFormTasks : MonoBehaviour {
 		WWW completedTasks = new WWW(database_url + "?getCompletedTodos=1", form);
 		yield return completedTasks;
 
+
 		downloadedCompletedTasksText = completedTasks.text;
 		this.GetComponent<UITaskScriptManager>().UpdateCompletedTasksFromDatabase(downloadedCompletedTasksText);
+	}
+
+	IEnumerator SendMotivationCheckIEnumerator(int motivationAmount){
+		WWWForm form = new WWWForm();
+		form.AddField("userName", userInfo.UserName);
+		form.AddField("motivation", motivationAmount);
+
+		WWW confirmedSentMotivationData = new WWW(database_url + "?setMotivation=1", form);
+		yield return confirmedSentMotivationData;
+
+		if(confirmedSentMotivationData.text == "Updated"){
+			this.GetComponent<UITaskScriptManager>().MotivationGroupSetActive(false);
+		}else{
+			Debug.LogError("Unknown database response when sending completed task information. Expected Updated but got: " + confirmedSentMotivationData.text);
+		}
 	}
 
 	IEnumerator ResetAllTodosIEnumerator(){

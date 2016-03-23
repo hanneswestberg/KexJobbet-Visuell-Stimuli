@@ -8,6 +8,7 @@ public class UILogInScriptManager : MonoBehaviour {
 	public RankManager rankManager;
 	public UITaskScriptManager uiTaskManager;
 	public EffectsManager effectMan;
+	public WWWFormUserLogIn logInForm;
 	public Text welcomeText;
 	public Text inputFieldUserName;
 	public InputField inputFieldPassword;
@@ -47,8 +48,8 @@ public class UILogInScriptManager : MonoBehaviour {
 
 			// We also need to update our username and password in our WWWForm script
 
-			this.GetComponent<WWWFormUserLogIn>().UpdateUserName(username);
-			this.GetComponent<WWWFormUserLogIn>().UpdatePassword(password);
+			logInForm.UpdateUserName(username);
+			logInForm.UpdatePassword(password);
 
 			if(rememberInfo_int == 1){
 				rememberInfo_GO.GetComponent<Toggle>().isOn = true;
@@ -57,7 +58,7 @@ public class UILogInScriptManager : MonoBehaviour {
 	}
 
 	void SaveChangedInfo(){
-		PlayerPrefs.SetString("username", (string)inputFieldUserName.text);
+		PlayerPrefs.SetString("username", (string)logInForm.UserName);
 		PlayerPrefs.SetString("password", (string)inputFieldPassword.text);
 		PlayerPrefs.SetInt("rememberInfo", (int)rememberInfo_int);
 	}
@@ -93,15 +94,14 @@ public class UILogInScriptManager : MonoBehaviour {
 	// GUI callbacks
 	public void WrongUsernameOrPasswordTextPopUp(){
 		wrongUsernameOrPasswordText_GO.GetComponent<Animator>().Play("WrongUsernameOrPasswordAnimation", -1, 0f);
-		logInButton_GO.SetActive(enabled);
 	}
 
 	public void InputFieldChangeUserName(){
-		this.GetComponent<WWWFormUserLogIn>().UpdateUserName(inputFieldUserName.text);
+		logInForm.UpdateUserName(inputFieldUserName.text);
 	}
 
 	public void InputFieldChangePassword(){
-		this.GetComponent<WWWFormUserLogIn>().UpdatePassword(inputFieldPassword.text);
+		logInForm.UpdatePassword(inputFieldPassword.text);
 	}
 
 	public void ToggleRememberInfo(){
@@ -113,7 +113,7 @@ public class UILogInScriptManager : MonoBehaviour {
 	}
 		
 	public void ButtonLogIn(){
-		this.GetComponent<WWWFormUserLogIn>().SendLogInInfo();
+		logInForm.SendLogInInfo();
 
 		if(rememberInfo_GO.GetComponent<Toggle>().isOn == true)
 		{
@@ -151,7 +151,7 @@ public class UILogInScriptManager : MonoBehaviour {
 			canvasGroup.interactable = false;
 			canvasGroup.blocksRaycasts = false;
 
-			if(effectMan.effectsEnabled == true){
+			if(effectMan.effectsEnabled == true && canvasGroup.gameObject.activeInHierarchy == true){
 				canvasGroup.GetComponent<Animator>().SetTrigger("LogOut");
 			}else{
 				canvasGroup.GetComponent<Animator>().enabled = false;
@@ -161,7 +161,7 @@ public class UILogInScriptManager : MonoBehaviour {
 	}
 
 	public void LogInToApplication(){
-		welcomeText.text = "Välkommen " + inputFieldUserName.text.ToUpperInvariant() + "!";
+		welcomeText.text = "Välkommen " + logInForm.UserName.ToUpperInvariant() + "!";
 
 		foreach(CanvasGroup logInGroup in logInGroups){
 			CanvasGroupSetVisible(logInGroup, false);
@@ -171,30 +171,37 @@ public class UILogInScriptManager : MonoBehaviour {
 			CanvasGroupSetVisible(canvasGroup, true);
 		}
 
-		CheckIfTestUser (inputFieldUserName.text);
+		CheckIfAdminUser (logInForm.UserName);
 	}
 
 	public void LogOutFromApplication(){
-		welcomeText.text = "Hej då " + inputFieldUserName.text.ToUpperInvariant() + "!";
-
-		foreach(CanvasGroup logInGroup in logInGroups){
-			CanvasGroupSetVisible(logInGroup, true);
-		}
+		welcomeText.text = "Hej då " + logInForm.UserName.ToUpperInvariant() + "!";
 
 		foreach(CanvasGroup canvasGroup in canvasGroupArray){
 			CanvasGroupSetVisible(canvasGroup, false);
 		}
+
+		foreach(CanvasGroup logInGroup in logInGroups){
+			CanvasGroupSetVisible(logInGroup, true);
+			logInButton_GO.SetActive(false);
+		}
+
+		StartCoroutine(WaitForLogOutAnimations());
 
 		// Rank and stars reset
 		ToggleCheatButtons(false);
 		rankManager.DeSpawnTheRank();
 		uiTaskManager.DestroyAllStars();
 		uiTaskManager.DeSpawnTheTaskButtons();
+
+		// UI Reset
+		uiTaskManager.MotivationQuestionQuit();
+		uiTaskManager.TutorialQuit();
 	}
 
 	// Checks if the user is able to use the cheat buttons
-	void CheckIfTestUser(string user){
-		if (user == "Hannes") {
+	void CheckIfAdminUser(string user){
+		if (user.ToLower() == "hannesve" || user.ToLower() == "thomasvp") {
 			ToggleCheatButtons (true);
 		}
 	}
@@ -203,5 +210,11 @@ public class UILogInScriptManager : MonoBehaviour {
 		foreach(GameObject cheatButton in cheatButtons){
 			cheatButton.SetActive (active);
 		}
+	}
+
+	IEnumerator WaitForLogOutAnimations(){
+		yield return new WaitForSeconds(0.85f);
+
+		logInButton_GO.SetActive(true);
 	}
 }

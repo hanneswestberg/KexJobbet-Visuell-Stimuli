@@ -3,6 +3,7 @@ using System.Collections;
 
 public class RankRotation : MonoBehaviour {
 
+	public EffectsManager effectMan;
 	public GameObject rankPlane;
 	public LayerMask mask;
 
@@ -17,26 +18,48 @@ public class RankRotation : MonoBehaviour {
 	Ray ray;
 	RaycastHit hit;
 
+	private bool rotationIsOn;
+
 	void Start(){
 		orginalRot = transform.rotation.eulerAngles;
-		reactDistance = 5f;
 	}
 
 	void Update () {
-		// Casts a ray to the cursorPlane and calculates the rotation of the rank
-		ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-		if(Physics.Raycast(ray, out hit, 100f, mask)){
-			point = hit.transform.InverseTransformPoint(hit.point);
+		if(rotationIsOn == true) {
+			// Casts a ray to the cursorPlane and calculates the rotation of the rank
+			ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+			if(Physics.Raycast(ray, out hit, 100f, mask)){
+				point = hit.transform.InverseTransformPoint(hit.point);
 
-			// Rank Rotation:
-			if (point.magnitude <= reactDistance){
-				planeRotX = orginalRot.x + Mathf.Clamp(point.z*maxRotAngle*10, -maxRotAngle, maxRotAngle);
-				planeRotY = orginalRot.y + Mathf.Clamp(point.x*maxRotAngle*10, -maxRotAngle, maxRotAngle);
+				// Rank Rotation:
+				if (point.magnitude <= reactDistance){
+					planeRotX = orginalRot.x + Mathf.Clamp(point.z*maxRotAngle*10, -maxRotAngle, maxRotAngle);
+					planeRotY = orginalRot.y + Mathf.Clamp(point.x*maxRotAngle*10, -maxRotAngle, maxRotAngle);
 
-				rankPlane.transform.rotation = Quaternion.Lerp(rankPlane.transform.rotation, Quaternion.Euler(planeRotX, planeRotY, 0f), reactSpeed);
-			}else{
-				rankPlane.transform.rotation = Quaternion.Lerp(rankPlane.transform.rotation, Quaternion.Euler(orginalRot), reactSpeed);
+					rankPlane.transform.rotation = Quaternion.Lerp(rankPlane.transform.rotation, Quaternion.Euler(planeRotX, planeRotY, 0f), reactSpeed);
+				}else{
+					rankPlane.transform.rotation = Quaternion.Lerp(rankPlane.transform.rotation, Quaternion.Euler(orginalRot), reactSpeed);
+				}
 			}
 		}
 	}
+
+	public void RankShadowsSetActive(bool active){
+		if(active == true){
+			rankPlane.transform.GetChild(0).gameObject.SetActive(true);
+		}else {
+			rankPlane.transform.GetChild(0).gameObject.SetActive(false);
+		}
+	}
+
+	public void RankEffectsSetActive(bool active){
+		if(active == true){
+			rotationIsOn = true;
+		} else{
+			rotationIsOn = false;
+
+		}
+	}
+
+
 }

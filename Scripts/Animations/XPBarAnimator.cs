@@ -9,12 +9,17 @@ public class XPBarAnimator : MonoBehaviour {
 	private float fillAmount;
 	public Image xpFiller;
 	public Image xpGlas;
+	public Transform xpLevelUpAnimationPoint;
+	public Animator[] starLines;
+	public Animator[] xpBarStars;
 
-	private bool hasChanged;
 	private bool firstStart;
-	private int currentXPBarQue = 0;
-	private int currentScore = 0;
+	private bool currentlyAnimating = false;
+	private bool leveledTwice = false;
+	private bool hasChanged = false;
+
 	private float tempFillAmount = 0f;
+	private float fillSpeed = 0.05f;
 
 	void Start(){
 		firstStart = true;
@@ -23,13 +28,37 @@ public class XPBarAnimator : MonoBehaviour {
 	void Update () 
 	{
 		if(effectMan.effectsEnabled == true){
-			xpFiller.fillAmount = Mathf.Lerp(xpFiller.fillAmount, fillAmount, 0.05f);
-			xpGlas.fillAmount = Mathf.Lerp(xpGlas.fillAmount, 1f - fillAmount, 0.05f);
+			xpFiller.fillAmount = Mathf.Lerp(xpFiller.fillAmount, fillAmount, fillSpeed);
+			xpGlas.fillAmount = Mathf.Lerp(xpGlas.fillAmount, 1f - fillAmount, fillSpeed);
 		} else{
 			xpFiller.fillAmount = fillAmount;
 			xpGlas.fillAmount = 1f - fillAmount;
 		}
 
+		if(leveledTwice == true && currentlyAnimating == false){ // We have leveled twice and need to animate the next level up animation
+			leveledTwice = false;
+			tempFillAmount = fillAmount;
+			StartCoroutine(LevelUpAnimation());
+		}
+
+		// Animate the XP  stars and lines
+		if(effectMan.effectsEnabled == true){
+			for (int i = 0; i < 4; i++) {
+				if(xpFiller.fillAmount >= (((i+1)*0.20f)+(0.05f*i))){
+					starLines[i].SetBool("StarLine_Fill", true);
+				} else{
+					starLines[i].SetBool("StarLine_Fill", false);
+				}
+			}
+		}
+	}
+
+	public void StartXPBarStarAnimations(){
+		if(effectMan.effectsEnabled == true){
+			foreach(Animator anim in xpBarStars){
+				anim.SetTrigger("Effects_enabled");
+			}
+		}
 	}
 
 	public void ResetFillAmount(){
@@ -37,28 +66,27 @@ public class XPBarAnimator : MonoBehaviour {
 		firstStart = true;
 	}
 
+	// Sets the fill amount of the XP - Bar, 0 is no fill, 1 is all filled up. 
 	public void SetFillAmount(float amount){
-		if (fillAmount != 1) {
+		hasChanged = true;
+
+		if (currentlyAnimating == false) { // Checks if we are currently animating for a level up
 			fillAmount = amount;
-			hasChanged = true;
 		} else {
 			tempFillAmount = amount;
 		}
 
-		if(amount == 0 && firstStart == false){
-			hasChanged = false;
-			StartCoroutine(LevelUpAnimation());
+		if(amount == 0 && firstStart == false){ // If we have recieved a 0. Of which only happen at the start OR we have just leveled up! We need to animate
+			if(currentlyAnimating == true){
+				leveledTwice = true;
+			}else if (effectMan.effectsEnabled == true){
+				StartCoroutine(LevelUpAnimation());
+			} else{
+				hasChanged = false;
+				StartCoroutine(LevelUpAnimationNoEffects());
+			}
 		}
 		firstStart = false;
-	}
-
-	public void AddToXPBarQue(int newScore){
-		if (currentXPBarQue == 0) {
-			currentXPBarQue = (newScore - currentScore);
-			StartCoroutine (XPBarQueAnimator ());
-		} else {
-			currentXPBarQue = (newScore - currentScore);
-		}
 	}
 
 	// Calculates the XP - Bar fill amount
@@ -67,28 +95,29 @@ public class XPBarAnimator : MonoBehaviour {
 	}
 
 	IEnumerator LevelUpAnimation(){
+		currentlyAnimating = true;
 		fillAmount = 1f;
-		effectMan.CreateEffectAt (effectMan.rankEffects [0], transform.position);
-		yield return new WaitForSeconds(1f);
-		
-			if(hasChanged == false){
-			xpFiller.fillAmount = 0f;
-			xpGlas.fillAmount = 1f;
-			fillAmount = tempFillAmount;
-			tempFillAmount = 0f;
-			}
+		yield return new WaitForSeconds(0.5f);
+		effectMan.CreateEffectAt (effectMan.rankEffects [1], xpLevelUpAnimationPoint.position);
+		effectMan.CreateEffectAt (effectMan.rankEffects [0], xpLevelUpAnimationPoint.position);
+		yield return new WaitForSeconds(0.5f);
+		fillAmount = 0f;
+		fillSpeed = 0.01f;
+		yield return new WaitForSeconds(2.5f);
+
+		fillSpeed = 0.05f;
+
+		fillAmount = tempFillAmount;
+		tempFillAmount = 0f;
+		currentlyAnimating = false;
 	}
 
-	IEnumerator XPBarQueAnimator(){
-		currentScore++;
-		CalculateXpBar (currentScore);
+	IEnumerator LevelUpAnimationNoEffects(){
+		fillAmount = 1f;
+		yield return new WaitForSeconds(1f);
 
-		yield return new WaitForSeconds (0.3f);
-		currentXPBarQue--;
-
-		Debug.Log ("Current tracked score is: " + currentScore + "\t Current que is: " + currentXPBarQue);
-		if (currentXPBarQue > 0) {
-			StartCoroutine(XPBarQueAnimator());
+		if(hasChanged == false){
+			fillAmount = 0f;
 		}
 	}
 }

@@ -6,10 +6,13 @@ public class UITaskScriptManager : MonoBehaviour {
 
 	public EffectsManager effectManager;
 	public RankManager rankManager;
+	public XPBarAnimator xpBarAnim;
+
 	public GameObject[] originalTasks;
 	public CanvasGroup[] tutorialGroup;
 	public CanvasGroup tutorialParentGroup;
 	public CanvasGroup motivationParentGroup;
+	public GameObject motivationButton;
 	public Text scoreCount;
 	char splitter = ',';
 
@@ -37,7 +40,7 @@ public class UITaskScriptManager : MonoBehaviour {
 		string[] splittedCompletedTasks = completedTaskString.Split(splitter);
 
 		// Activates the buttons and spawn stars for the uncompleted tasks
-		for (int i = 0; i < (splittedCompletedTasks.Length-1); i++) {
+		for (int i = 0; i < 3; i++) {
 			if (splittedCompletedTasks[i] == "0"){
 				originalTasks[i].GetComponent<Button>().interactable = true;
 				originalTasks[i].GetComponent<TaskStarManager>().CreateTaskStars(i+1);
@@ -53,8 +56,8 @@ public class UITaskScriptManager : MonoBehaviour {
 		}
 
 		// We have got the score from the database, we need to save it and update the rank
-		rankManager.CurrentScore = int.Parse(splittedCompletedTasks[splittedCompletedTasks.Length-1]);
-		scoreCount.text = splittedCompletedTasks[splittedCompletedTasks.Length-1];
+		rankManager.CurrentScore = int.Parse(splittedCompletedTasks[3]);
+		scoreCount.text = splittedCompletedTasks[3];
 		rankManager.SpawnTheRank();
 
 		// We need to spawn the Task buttons
@@ -63,14 +66,33 @@ public class UITaskScriptManager : MonoBehaviour {
 		}else{
 			SpawnTheTaskButtons();
 		}
+
+		// We have recieved the motivationCheck variable, if 0 we can send current motivation data
+		if(splittedCompletedTasks[4] == "0"){
+			motivationButton.SetActive(true);
+			motivationButton.GetComponent<Animator>().SetBool("MotivationDone", false);
+		} else{
+			motivationButton.SetActive(false);
+		}
+
+		// Animation triggers:
+		xpBarAnim.StartXPBarStarAnimations();
 	}
 
 	// Activates the buttons and plays the spawn animation if we have effects enabled
 	void SpawnTheTaskButtons(){
 		if (effectManager.effectsEnabled == true){ // If we have effects enabled, then we want to start animation
 			StartCoroutine(PlayAnimationsQue(taskAnimators, "TaskButtons_PopInRight", 0.2f));
-		} else{ 
+
+			/// BugFix, Tomorrows task too low alpha
+			for (int i = 3; i < 6; i++) {
+				originalTasks[i].transform.GetChild(0).GetComponent<Image>().color = new Color(255f, 255f, 255f, 255f);
+			}
+		} else{
 			for (int i = 0; i < 6; i++) {
+				originalTasks[i].GetComponent<TaskStarManager>().SpawnCheckEffects();
+				originalTasks[i].transform.GetChild(0).GetComponent<Image>().color = new Color(255f, 255f, 255f, 255f);
+
 				if(i < 3){
 					ToggleButtonVisible(originalTasks[i].transform.GetComponent<CanvasGroup>(), true, false);
 				} else{
@@ -128,6 +150,13 @@ public class UITaskScriptManager : MonoBehaviour {
 		rankManager.CurrentScore = 0;
 		rankManager.ResetRank();
 		SpawnTheTaskButtons();
+		motivationButton.SetActive(true);
+
+		if(effectManager.effectsEnabled == true){
+			motivationButton.GetComponent<Animator>().enabled = true;
+			motivationButton.GetComponent<Animator>().SetBool("MotivationDone", false);
+			motivationButton.GetComponent<Animator>().SetTrigger("MotivationReset");
+		}
 	}
 
 	// Triggers when we have pressed a button
@@ -153,19 +182,20 @@ public class UITaskScriptManager : MonoBehaviour {
 	public void AddStarsToTotal(int score = 0){
 		int newScore = (int.Parse (scoreCount.text) + score);
 		if(effectManager.effectsEnabled == true){
-			if(rankManager.CurrentScore >= newScore){
-				rankManager.CalculateXpBar(newScore);
+			if(rankManager.CurrentScore >= newScore){ // We need to check this so we don't add more stars than we should have, when animating
+				
+				// We want the star total text to update instantly, but the rank and xp bar should be animated
 				scoreCount.text = newScore.ToString();
+				scoreCount.GetComponent<Animator>().SetTrigger("AddScore");
 				rankManager.CheckForRankUpgrade(newScore);
 			}
 		} else{
-			rankManager.CalculateXpBar(newScore);
 			scoreCount.text = newScore.ToString();
 			rankManager.CheckForRankUpgrade(newScore);
 		}
-
 	}
 
+	// Cheats are only avaliable to admins
 	public void CheatAddStars(){
 		rankManager.CurrentScore += 1;
 		AddStarsToTotal (1);
@@ -200,8 +230,27 @@ public class UITaskScriptManager : MonoBehaviour {
 	}
 
 	public void MotivationQuestionSave(int motivationAmount){
-		// SAVE SHIT HERE
+		this.GetComponent<WWWFormTasks>().SendMotivationCheck(motivationAmount);
 		MotivationQuestionQuit ();
+	}
+
+	public void MotivationGroupSetActive(bool active){
+		if (active == true){
+			motivationParentGroup.interactable = true;
+			motivationParentGroup.blocksRaycasts = true;
+			motivationParentGroup.alpha = 1f;
+		}else{
+			motivationParentGroup.interactable = false;
+			motivationParentGroup.blocksRaycasts = false;
+			motivationParentGroup.alpha = 0f;
+			motivationButton.GetComponent<Animator>().SetBool("MotivationDone", true);
+
+			if(effectManager.effectsEnabled == true){
+				StartCoroutine(DisableMotivationGroup());
+			}else{
+				motivationButton.SetActive(false);
+			}
+		}
 	}
 
 	public void TutorialStart(){
@@ -239,7 +288,6 @@ public class UITaskScriptManager : MonoBehaviour {
 			canvasGroup.blocksRaycasts = false;
 
 			if(effectManager.effectsEnabled == true){
-				//Debug.Log (canvasGroup.name);
 				canvasGroup.GetComponent<Animator>().SetTrigger("PopOut");
 			}else{
 				canvasGroup.GetComponent<Animator>().enabled = false;
@@ -258,7 +306,6 @@ public class UITaskScriptManager : MonoBehaviour {
 			}
 		}
 	}
-
 
 	IEnumerator PlayAnimationsQue(Animator[] animators, string triggerName, float waitTime){
 		for (int i = 0; i < 6; i++) {
@@ -298,10 +345,14 @@ public class UITaskScriptManager : MonoBehaviour {
 			yield return new WaitForSeconds(waitTime);
 		}
 
-		for (int i = 0; i < 3; i++) {
+		for (int i = 0; i < 6; i++) {
 			originalTasks[i].GetComponent<TaskStarManager>().DestroyAllStarsConnectedToTask();
 		}
+	}
 
+	IEnumerator DisableMotivationGroup(){
+		yield return new WaitForSeconds(1f);
+		motivationButton.SetActive(false);
 	}
 		
 }
