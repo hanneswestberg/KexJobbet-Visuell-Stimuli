@@ -3,6 +3,9 @@ using System.Collections;
 
 public class WWWFormUserLogIn : MonoBehaviour {
 
+	public EffectsManager effectMan;
+	public bool effectsInverted = false;
+
 	string database_url = "http://xml.csc.kth.se/~thomasvp/DM2517/kex/index.php?login=1";
 	string userName = "";
 
@@ -26,6 +29,18 @@ public class WWWFormUserLogIn : MonoBehaviour {
 		}
 	}
 
+	void SetEffectsEnabled(bool active){
+		if(effectsInverted == false){
+			effectMan.effectsEnabled = active;
+		} else{
+			if(active == true){
+				effectMan.effectsEnabled = false;
+			} else{
+				effectMan.effectsEnabled = true;
+			}
+		}
+	}
+
 
 	IEnumerator SendLogInInfoIEnumerator(){
 		WWWForm form = new WWWForm();
@@ -40,7 +55,13 @@ public class WWWFormUserLogIn : MonoBehaviour {
 		if(!string.IsNullOrEmpty(download.error)){
 			print("Error downloading: " + download.error);
 		}else{
-			if(download.text == "True"){
+			if(download.text == "True, 1"){
+				SetEffectsEnabled(true);
+				this.GetComponent<UILogInScriptManager>().LogInToApplication();
+				Debug.Log("Login Successful");
+				GameObject.Find("TaskManager").GetComponent<WWWFormTasks>().RequestTasksFromDatabase();
+			}else if(download.text == "True, 0"){
+				SetEffectsEnabled(false);
 				this.GetComponent<UILogInScriptManager>().LogInToApplication();
 				Debug.Log("Login Successful");
 				GameObject.Find("TaskManager").GetComponent<WWWFormTasks>().RequestTasksFromDatabase();

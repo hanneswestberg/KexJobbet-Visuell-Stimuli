@@ -18,18 +18,21 @@ public class XPBarAnimator : MonoBehaviour {
 	private bool leveledTwice = false;
 	private bool hasChanged = false;
 
+	private float currentFillSpeed = 0f;
+	private float currentFillFactor = 5f;
 	private float tempFillAmount = 0f;
-	private float fillSpeed = 0.05f;
 
 	void Start(){
 		firstStart = true;
+		currentFillFactor = 5f;
 	}
 
 	void Update () 
 	{
 		if(effectMan.effectsEnabled == true){
-			xpFiller.fillAmount = Mathf.Lerp(xpFiller.fillAmount, fillAmount, fillSpeed);
-			xpGlas.fillAmount = Mathf.Lerp(xpGlas.fillAmount, 1f - fillAmount, fillSpeed);
+			currentFillSpeed = currentFillFactor*Time.deltaTime;
+			xpFiller.fillAmount = Mathf.Lerp(xpFiller.fillAmount, fillAmount, currentFillSpeed);
+			xpGlas.fillAmount = Mathf.Lerp(xpGlas.fillAmount, 1f - fillAmount, currentFillSpeed);
 		} else{
 			xpFiller.fillAmount = fillAmount;
 			xpGlas.fillAmount = 1f - fillAmount;
@@ -102,10 +105,10 @@ public class XPBarAnimator : MonoBehaviour {
 		effectMan.CreateEffectAt (effectMan.rankEffects [0], xpLevelUpAnimationPoint.position);
 		yield return new WaitForSeconds(0.5f);
 		fillAmount = 0f;
-		fillSpeed = 0.01f;
+		currentFillFactor = 3f;
 		yield return new WaitForSeconds(2.5f);
 
-		fillSpeed = 0.05f;
+		currentFillFactor = 5f;
 
 		fillAmount = tempFillAmount;
 		tempFillAmount = 0f;

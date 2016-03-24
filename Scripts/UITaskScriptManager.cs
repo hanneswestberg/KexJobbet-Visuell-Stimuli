@@ -76,6 +76,7 @@ public class UITaskScriptManager : MonoBehaviour {
 		}
 
 		// Animation triggers:
+		effectManager.AllButtonsEffectSetActive(true);
 		xpBarAnim.StartXPBarStarAnimations();
 	}
 

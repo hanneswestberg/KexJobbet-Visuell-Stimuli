@@ -14,6 +14,7 @@ public class StarAnimations : MonoBehaviour {
 	float posY;
 	Vector3 currentPos;
 	Vector3 lastPos;
+	float currentSpeed = 0f;
 
 	//Rotation
 	float rot;
@@ -55,8 +56,9 @@ public class StarAnimations : MonoBehaviour {
 		if (readyToAnimateToGatherPoint == true){
 			// ANIMATE POSITION
 			lastPos = transform.position;
-			posX = Mathf.Lerp(transform.position.x, starGatherPointOnCompletedTask.position.x, 0.03f);
-			posY = Mathf.Lerp(transform.position.y, starGatherPointOnCompletedTask.position.y, 0.03f);
+			currentSpeed = 5f*Time.deltaTime;
+			posX = Mathf.Lerp(transform.position.x, starGatherPointOnCompletedTask.position.x, currentSpeed);
+			posY = Mathf.Lerp(transform.position.y, starGatherPointOnCompletedTask.position.y, currentSpeed);
 			currentPos = new Vector3(posX, posY,transform.position.z);
 			transform.position = currentPos;
 

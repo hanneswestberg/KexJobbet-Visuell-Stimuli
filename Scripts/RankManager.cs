@@ -6,6 +6,7 @@ public class RankManager : MonoBehaviour {
 
 	public EffectsManager effectManager;
 	public Text rankUIText;
+	public Image rankTextBox;
 	public GameObject rankHolder;
 	public GameObject rankPlane;
 	public RankRotation rankRot;
@@ -110,23 +111,25 @@ public class RankManager : MonoBehaviour {
 		// Text
 		rankUIText.text = "" + (rank+1).ToString() + ": " + standard_rank + rankDescription[rank];
 
+		/*
 		if((rank+1) >= 5 && effectManager.effectsEnabled == true){
-			rankUIText.GetComponent<Animator>().SetBool("Over5", true);
+			rankTextBox.GetComponent<Animator>().SetBool("Over5", true);
 
 			if((rank+1) >= 10){
-				rankUIText.GetComponent<Animator>().SetBool("Over10", true);
+				rankTextBox.GetComponent<Animator>().SetBool("Over10", true);
 
 				if((rank+1) >= 16){
-					rankUIText.GetComponent<Animator>().SetBool("Over16", true);
+					rankTextBox.GetComponent<Animator>().SetBool("Over16", true);
 				} else{
-					rankUIText.GetComponent<Animator>().SetBool("Over16", false);
+					rankTextBox.GetComponent<Animator>().SetBool("Over16", false);
 				}
 			}else{
-				rankUIText.GetComponent<Animator>().SetBool("Over10", false);
+				rankTextBox.GetComponent<Animator>().SetBool("Over10", false);
 			}
 		}else{
-			rankUIText.GetComponent<Animator>().SetBool("Over5", false);
+			rankTextBox.GetComponent<Animator>().SetBool("Over5", false);
 		}
+		*/
 
 		// Material Textures
 		rankMaterial.mainTexture = rankTextures[rank];
@@ -155,7 +158,7 @@ public class RankManager : MonoBehaviour {
 		yield return new WaitForSeconds(0.5f);
 		rankPlane.GetComponent<Animator>().SetTrigger("RankUpgradeWait");
 		rankUIText.GetComponent<Animator>().SetTrigger("RankUp");
-		effectManager.CreateEffectAt (effectManager.rankEffects [2], transform.position);
+		effectManager.CreateEffectAt (effectManager.rankEffects [2], effectManager.RankEffectPosition);
 		yield return new WaitForSeconds(2f);
 
 		string rankUpgradeString = "RankUpgrade_" + (rank+1).ToString();

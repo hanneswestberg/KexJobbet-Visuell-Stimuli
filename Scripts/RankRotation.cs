@@ -9,7 +9,8 @@ public class RankRotation : MonoBehaviour {
 
 	[SerializeField] private float maxRotAngle = 15f;
 	[SerializeField] private float reactDistance = 5f;
-	[Range(0.01f, 1f)] public float reactSpeed = 0.05f;
+	[Range(1f, 50f)] public float reactSpeed = 1f;
+	float currentReactSpeed = 0f;
 
 	Vector3 orginalRot;
 	float planeRotX;
@@ -26,6 +27,9 @@ public class RankRotation : MonoBehaviour {
 
 	void Update () {
 		if(rotationIsOn == true) {
+
+			currentReactSpeed = reactSpeed*Time.deltaTime;
+
 			// Casts a ray to the cursorPlane and calculates the rotation of the rank
 			ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 			if(Physics.Raycast(ray, out hit, 100f, mask)){
@@ -36,9 +40,9 @@ public class RankRotation : MonoBehaviour {
 					planeRotX = orginalRot.x + Mathf.Clamp(point.z*maxRotAngle*10, -maxRotAngle, maxRotAngle);
 					planeRotY = orginalRot.y + Mathf.Clamp(point.x*maxRotAngle*10, -maxRotAngle, maxRotAngle);
 
-					rankPlane.transform.rotation = Quaternion.Lerp(rankPlane.transform.rotation, Quaternion.Euler(planeRotX, planeRotY, 0f), reactSpeed);
+					rankPlane.transform.rotation = Quaternion.Lerp(rankPlane.transform.rotation, Quaternion.Euler(planeRotX, planeRotY, 0f), currentReactSpeed);
 				}else{
-					rankPlane.transform.rotation = Quaternion.Lerp(rankPlane.transform.rotation, Quaternion.Euler(orginalRot), reactSpeed);
+					rankPlane.transform.rotation = Quaternion.Lerp(rankPlane.transform.rotation, Quaternion.Euler(orginalRot), currentReactSpeed);
 				}
 			}
 		}
