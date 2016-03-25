@@ -10,6 +10,7 @@ public class UILogInScriptManager : MonoBehaviour {
 	public EffectsManager effectMan;
 	public WWWFormUserLogIn logInForm;
 	public Text welcomeText;
+	public Text loggingInText;
 	public Text inputFieldUserName;
 	public InputField inputFieldPassword;
 	public CanvasGroup[] canvasGroupArray;
@@ -122,6 +123,11 @@ public class UILogInScriptManager : MonoBehaviour {
 		}else{
 			ResetInfo();
 		}
+	}
+
+	public void ButtonLogInSetActive(bool active){
+		logInButton_GO.SetActive(active);
+		loggingInText.gameObject.SetActive(!active);
 	}
 
 	public void ButtonQuitApplication(){

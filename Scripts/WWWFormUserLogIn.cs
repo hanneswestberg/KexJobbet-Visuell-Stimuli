@@ -50,7 +50,11 @@ public class WWWFormUserLogIn : MonoBehaviour {
 
 		WWW download = new WWW(database_url, form);
 
+		this.GetComponent<UILogInScriptManager>().ButtonLogInSetActive(false);
 		yield return download;
+
+		this.GetComponent<UILogInScriptManager>().ButtonLogInSetActive(true);
+
 
 		if(!string.IsNullOrEmpty(download.error)){
 			print("Error downloading: " + download.error);
