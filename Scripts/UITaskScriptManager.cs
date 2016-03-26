@@ -14,6 +14,7 @@ public class UITaskScriptManager : MonoBehaviour {
 	public CanvasGroup motivationParentGroup;
 	public GameObject motivationButton;
 	public Text scoreCount;
+	public Text DayCount;
 	char splitter = ',';
 
 	Animator[] taskAnimators = new Animator[]{};
@@ -29,9 +30,12 @@ public class UITaskScriptManager : MonoBehaviour {
 
 		string[] splittedTasks = taskString.Split(splitter);
 
-		for (int i = 0; i < (splittedTasks.Length-1); i++) {
+		for (int i = 0; i < 5; i++) {
 			originalTasks[i].transform.GetComponent<TaskStarManager>().taskText.GetComponent<Text>().text = ("* " + splittedTasks[i]);
 		}
+
+		DayCount.text = "Dag: " + splittedTasks[6];
+
 		this.GetComponent<WWWFormTasks>().RequestCompletedTasksFromDatabase();
 	}
 
