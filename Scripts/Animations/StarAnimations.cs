@@ -82,7 +82,7 @@ public class StarAnimations : MonoBehaviour {
 	}
 
 	IEnumerator DestroyAfterFadeOut(){
-		effectsManager.CreateEffectAt(effectsManager.starExplodeEffects[1], effectsManager.starCountEffectPosition);
+		effectsManager.CreateEffectAt(effectsManager.starExplodeEffects[1], effectsManager.starCountEffectPosition.position);
 		yield return new WaitForSeconds(0.5f);
 		ui_task.AddStarsToTotal(1);
 		Destroy(this.gameObject);

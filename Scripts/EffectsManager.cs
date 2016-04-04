@@ -8,7 +8,8 @@ public class EffectsManager : MonoBehaviour {
 	public GameObject[] rankEffects;
 	public Button[] allAnimButtons;
 
-	[HideInInspector] public Vector3 starCountEffectPosition = new Vector3(9.18f, -3.7f, 0f);
+	public Transform starCountEffectPosition;
+	public Transform rankUpXpBarEffectPosition;
 
 	[HideInInspector] private Vector3 rankEffectPosition = new Vector3(0f, 0.7f, 0f);
 	[HideInInspector] private Vector3 rankEffectPositionLower = new Vector3(0f, -1f, 0f);

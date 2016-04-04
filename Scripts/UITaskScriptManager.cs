@@ -30,7 +30,7 @@ public class UITaskScriptManager : MonoBehaviour {
 
 		string[] splittedTasks = taskString.Split(splitter);
 
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < 6; i++) {
 			originalTasks[i].transform.GetComponent<TaskStarManager>().taskText.GetComponent<Text>().text = ("* " + splittedTasks[i]);
 		}
 
